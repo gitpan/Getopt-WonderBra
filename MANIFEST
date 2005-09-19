@@ -1,0 +1,10 @@
+.cvsignore
+Changes
+GNUmakefile
+MANIFEST
+Makefile.PL
+README
+lib/Getopt/WonderBra.pm
+t/00_useok.t
+t/01_wonderbra.t
+META.yml                                 Module meta-data (added by MakeMaker)
