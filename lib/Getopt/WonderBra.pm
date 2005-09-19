@@ -6,22 +6,22 @@ Getopt::WonderBra - Lift and Separate Command Line Options
 
 =head1 SYNOPSIS
 
-use Getopt::WonderBra;
-@ARGV = getopt( 'opts:-:', @ARGV );
-print Dumper( \@ARGV );
-sub help() { print "Useless help message"; };
-sub version() { print "Useless version message"; };
-while ( ( $_ = shift ) ne '--' ) {
-	if    (/^-o$/) { $opt_o++ }
-	elsif (/^-p$/) { $opt_p++ }
-	elsif (/^-t$/) { $opt_t++ }
-	elsif (/^-s$/) { push( @opt_s, shift ); }
-	elsif (/^--/)  { push( @opt_long, $_ ); }
-	else           { die 'I do not grok -', $_; }
-}
-while (<>) {
-	print;
-}
+    use Getopt::WonderBra;
+    @ARGV = getopt( 'opts:-:', @ARGV );
+    print Dumper( \@ARGV );
+    sub help() { print "Useless help message"; };
+    sub version() { print "Useless version message"; };
+    while ( ( $_ = shift ) ne '--' ) {
+    	if    (/^-o$/) { $opt_o++ }
+    	elsif (/^-p$/) { $opt_p++ }
+    	elsif (/^-t$/) { $opt_t++ }
+    	elsif (/^-s$/) { push( @opt_s, shift ); }
+    	elsif (/^--/)  { push( @opt_long, $_ ); }
+    	else           { die 'I do not grok -', $_; }
+    }
+    while (<>) {
+    	print;
+    }
 
 =head1 REQUIRES
 
@@ -75,7 +75,7 @@ STDOUT will always be selected.
 
 package Getopt::WonderBra;
 use strict;
-our($VERSION)=1.0;
+our($VERSION)="1.01";
 
 
 use strict;
