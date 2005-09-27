@@ -75,7 +75,7 @@ STDOUT will always be selected.
 
 package Getopt::WonderBra;
 use strict;
-our($VERSION)="1.01";
+our($VERSION)="1.02";
 
 
 use strict;
@@ -163,17 +163,15 @@ sub singleopt($\@){
 sub doubleopt($\@){
 	return help()			if $_[0] eq 'help';
 	return version()		if $_[0] eq 'version';
-	return "--".$_[0]       if $switches{'-'} eq 'arg';
-	help("long opts not supported!\n");
-	();
+	return "--".$_[0];
 }
 
-sub getopt($\@;\%) {
+sub getopt($\@) {
 	rep_funcs;
-	local ($_, %switches, @arg, @noarg);
+	my ($opts,$args) = @_;
 	confess "Internal Error: Missing switch specifiers" unless @_;
-	parsefmt(shift);
-	*_=shift;
+	parsefmt($opts);
+	local *_ = $args;
 	my @nonopts;
 	my @opts;
 	while(@_) {
