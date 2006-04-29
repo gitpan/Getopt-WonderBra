@@ -1,14 +1,14 @@
 all::
 
-Makefile: Makefile.PL MANIFEST lib/Getopt/WonderBra.pm
+ifeq ($(wildcard Makefile),)
+all:: Makefile
+
+Makefile: Makefile.PL
 	perl Makefile.PL
 	test -e Makefile
-	touch XXX
-	make $(MAKECMDGOALS)
 
-MANIFEST:
-	cvsfiles -p | xargs lsfiles | sort > $@.new
-	mv $@.new $@
-
-$(shell touch XXX)
+else
 include Makefile
+endif
+
+dist: manifest

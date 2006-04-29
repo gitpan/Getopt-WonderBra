@@ -4,8 +4,6 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 my $FIRST = "gen.mk";
 WriteMakefile(
-	FIRST_MAKEFILE	  => "XXX",
-	MAKEFILE_OLD	  => "XXX.old",
     NAME              => 'Getopt::WonderBra',
     VERSION_FROM      => 'lib/Getopt/WonderBra.pm', # finds $VERSION
     PREREQ_PM         => {}, # e.g., Module::Name => 1.1

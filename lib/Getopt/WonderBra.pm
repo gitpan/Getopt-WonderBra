@@ -6,22 +6,26 @@ Getopt::WonderBra - Lift and Separate Command Line Options
 
 =head1 SYNOPSIS
 
-    use Getopt::WonderBra;
-    @ARGV = getopt( 'opts:-:', @ARGV );
-    print Dumper( \@ARGV );
-    sub help() { print "Useless help message"; };
-    sub version() { print "Useless version message"; };
-    while ( ( $_ = shift ) ne '--' ) {
-    	if    (/^-o$/) { $opt_o++ }
-    	elsif (/^-p$/) { $opt_p++ }
-    	elsif (/^-t$/) { $opt_t++ }
-    	elsif (/^-s$/) { push( @opt_s, shift ); }
-    	elsif (/^--/)  { push( @opt_long, $_ ); }
-    	else           { die 'I do not grok -', $_; }
-    }
-    while (<>) {
-    	print;
-    }
+	use Getopt::WonderBra;
+	@ARGV = getopt( 'opts:-:', @ARGV );
+
+	sub help() { print "Useless help message"; };
+	sub version() { print "Useless version message"; };
+	while ( ( $_ = shift ) ne '--' ) {
+		if    (/^-o$/) { $opt_o++ }
+		elsif (/^-p$/) { $opt_p++ }
+		elsif (/^-t$/) { $opt_t++ }
+		elsif (/^-s$/) { push( @opt_s, shift ); }
+		elsif (/^--/)  { push( @opt_long, $_ ); }
+		else           { die 'I do not grok -', $_; }
+	}
+	print "-o given $opt_o times" if $opt_o;
+	print "-p given $opt_p times" if $opt_p;
+	print "-t given $opt_t times" if $opt_t;
+	print "-s given with arg $_" for @opt_s;
+	print "long opt $_ given" for @opt_long;
+	print "";
+	print "  param: $_" for @ARGV;
 
 =head1 REQUIRES
 
@@ -29,12 +33,11 @@ perl5.008006, Carp, Exporter
 
 =head1 EXPORTS
 
-getopt($@) also wraps main::help(@) and main::version(), or exports
-it's own (nearly worthless) versions if they do not exist.
+getopt($@)
 
 =head1 DESCRIPTION
 
-See example.pl for an example of usage.
+See eg/WonderBra.pl for an example of usage.
 
 There just weren't enough command line processessing modules, so I had
 to write my own.  Actually, it exists because it made it easy to port
@@ -43,28 +46,26 @@ none of the modules that are actually named after it do.  (Though some
 act like the C function)  The following sequence chops your args up and
 gives 'em to you straight:
 
-=head2 HELP
+=head1 HELP
 
-main::help(), if it exists, is wrapped by this module. This is done to
-ensure correct behavior for programs that use getopt.  (e.g. error
-messages to stdout if --help in specified, so $ foo --help | less has
-the desired results)
+main::help() must exist prior to calling getopt().  It is wrapped by
+this module.  This is done to ensure correct behavior for programs that
+use getopt.  (e.g.  error messages to stdout if --help in specified,
+so $ foo --help | less has the desired results)
 
-The wrapping has the following effects:
+main::help() is replaced by a wrapper that will exit the program.
+If it gets args, it will select STDERR, call your help function, print
+the passed args, and exit non-zero.
 
-=over
-=item *
-If any args are passed to main::help, STDERR will be selected
-before your sub is called, the args will be printed after your sub is
-called, and the program will exit 1.
+Otherwise, it will select STDOUT, call your help function, and exit non-zero.
 
-=item *
-If no args are passed to main::help, STDOUT will be selected
-before your sub is called, and the program will exit 0.
+Note that the program will exit if you call help after calling getopt, as
+well.  This is not a bug.  It's for issuing error messages while handling
+the parsed args.
 
-=back
+The wrapper sub never returns.
 
-=head2 VERSION
+=head1 VERSION
 
 If you define a main::version() sub, it will be called if the
 user specified --version, and the program will terminate.
@@ -75,7 +76,7 @@ STDOUT will always be selected.
 
 package Getopt::WonderBra;
 use strict;
-our($VERSION)="1.02";
+our($VERSION)="1.04";
 
 
 use strict;
@@ -134,6 +135,10 @@ sub parsefmt($){
 		};
 	}
 	$switches{'-'} = 'arg' if defined $switches{'-'};
+	if ( defined($ENV{GETOPT_WONDERBRA_DUMP_FMT}) ) {
+		eval 'use Data::Dumper;';
+		print STDERR Dumper(\%switches);
+	};
 }
 
 sub singleopt($\@){
@@ -163,6 +168,8 @@ sub singleopt($\@){
 sub doubleopt($\@){
 	return help()			if $_[0] eq 'help';
 	return version()		if $_[0] eq 'version';
+	help("not accepting long opts, but got --$_[0]")
+		unless defined $switches{'-'};
 	return "--".$_[0];
 }
 
